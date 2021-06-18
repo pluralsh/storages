@@ -108,12 +108,13 @@ func getDefaultConfig(settings map[string]string) *aws.Config {
 
 // TODO : unit tests
 func createSession(bucket string, settings map[string]string) (*session.Session, error) {
-	config := getDefaultConfig(settings)
-	config.MaxRetries = &MaxRetries
-	if _, err := config.Credentials.Get(); err != nil {
-		return nil, errors.Wrapf(err, "failed to get AWS credentials; please specify %s and %s", AccessKeyIdSetting, SecretAccessKeySetting)
+	config := &aws.Config{}
+	config.WithLogLevel(aws.LogDebug)
+	if endpoint, ok := settings[EndpointSetting]; ok {
+		config = config.WithEndpoint(endpoint)
 	}
 
+	config.MaxRetries = &MaxRetries
 	if s3ForcePathStyleStr, ok := settings[ForcePathStyleSetting]; ok {
 		s3ForcePathStyle, err := strconv.ParseBool(s3ForcePathStyleStr)
 		if err != nil {
