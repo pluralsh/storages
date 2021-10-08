@@ -91,12 +91,7 @@ func getDefaultConfig(settings map[string]string) *aws.Config {
 
 	if logLevel, ok := settings[LogLevel]; ok {
 		config = config.WithLogLevel(func(s string) aws.LogLevelType {
-			switch s {
-			case "DEVEL":
-				return aws.LogDebug
-			default:
-				return aws.LogOff
-			}
+			return aws.LogOff
 		}(logLevel))
 	}
 
@@ -109,10 +104,10 @@ func getDefaultConfig(settings map[string]string) *aws.Config {
 // TODO : unit tests
 func createSession(bucket string, settings map[string]string) (*session.Session, error) {
 	config := &aws.Config{}
-	config.WithLogLevel(aws.LogDebug)
 	if endpoint, ok := settings[EndpointSetting]; ok {
 		config = config.WithEndpoint(endpoint)
 	}
+	config = config.WithLogLevel(aws.LogOff)
 
 	config.MaxRetries = &MaxRetries
 	if s3ForcePathStyleStr, ok := settings[ForcePathStyleSetting]; ok {
